@@ -5,14 +5,17 @@ ENV JMETER_VERSION ${JMETER_VERSION:-3.3}
 ENV JMETER_HOME /jmeter/apache-jmeter-$JMETER_VERSION/
 ENV PATH $JMETER_HOME/bin:$PATH
 
+
 # INSTALL PRE-REQ
 RUN apt-get update && \
     apt-get -y install \
     wget 
+RUN apt-get install unzip
 
 # INSTALL JMETER BASE 
 RUN mkdir /jmeter
 WORKDIR /jmeter
+
 
 RUN wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-$JMETER_VERSION.tgz && \
     tar -xzf apache-jmeter-$JMETER_VERSION.tgz && \
@@ -23,7 +26,11 @@ RUN wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-$JMETER_V
     unzip -o JMeterPlugins-ExtrasLibs-1.4.0.zip -d /jmeter/apache-jmeter-$JMETER_VERSION
 
 WORKDIR $JMETER_HOME 
-    
+
+COPY external-libs/kloadgen-1.5.0.jar lib/ext/
+COPY external-libs/TimestampPlugin.jar lib/ext/
+COPY external-libs/jmeter-prometheus-plugin-0.6.1-SNAPSHOT.jar lib/ext/
+
 COPY config/user.properties bin/user.properties
 COPY scripts/install_plugin-manager.sh .
 COPY scripts/docker-entrypoint.sh /docker-entrypoint.sh
